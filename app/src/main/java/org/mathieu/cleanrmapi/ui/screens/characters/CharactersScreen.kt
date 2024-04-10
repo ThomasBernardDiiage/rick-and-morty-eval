@@ -1,5 +1,6 @@
 package org.mathieu.cleanrmapi.ui.screens.characters
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.background
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
@@ -67,6 +69,7 @@ fun CharactersScreen(navController: NavController) {
 }
 
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 private fun CharactersContent(
@@ -86,6 +89,8 @@ private fun CharactersContent(
     )
 }) { paddingValues ->
 
+    val listState = rememberLazyListState()
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -103,19 +108,21 @@ private fun CharactersContent(
                     fontWeight = FontWeight.Medium,
                     lineHeight = 36.sp
                 )
-            } ?: LazyColumn {
+            } ?: LazyColumn(state = listState) {
 
-                items(state.characters) {
+                items(state.characters.count()) { index ->
                     CharacterCard(
                         modifier = Modifier
                             .padding(8.dp)
                             .clickable {
-                                onAction(CharactersAction.SelectedCharacter(it))
+                                onAction(CharactersAction.SelectedCharacter(state.characters[index]))
                             },
-                        character = it
+                        character = state.characters[index]
                     )
+                    if (index == state.characters.count() - 1) {
+                        onAction(CharactersAction.LoadMoreCharacters)
+                    }
                 }
-
             }
         }
     }
