@@ -119,6 +119,8 @@ private fun CharactersContent(
                             },
                         character = state.characters[index]
                     )
+
+                    // Load more characters when the last item is reached
                     if (index == state.characters.count() - 1) {
                         onAction(CharactersAction.LoadMoreCharacters)
                     }

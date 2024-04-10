@@ -8,9 +8,12 @@ import org.koin.dsl.module
 import org.mathieu.cleanrmapi.data.local.CharacterDAO
 import org.mathieu.cleanrmapi.data.local.RMDatabase
 import org.mathieu.cleanrmapi.data.remote.CharacterApi
+import org.mathieu.cleanrmapi.data.remote.EpisodeApi
 import org.mathieu.cleanrmapi.data.remote.HttpClient
 import org.mathieu.cleanrmapi.data.repositories.CharacterRepositoryImpl
+import org.mathieu.cleanrmapi.data.repositories.EpisodeRepositoryImpl
 import org.mathieu.cleanrmapi.domain.repositories.CharacterRepository
+import org.mathieu.cleanrmapi.domain.repositories.EpisodeRepository
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -49,13 +52,16 @@ val dataModule = module {
     single { provideHttpClient() }
 
     single { provideApi<CharacterApi>(get()) }
+    single { provideApi<EpisodeApi>(get()) }
 
     single { provideDataBase(get()) }
 
     single<CharacterRepository> {
-        val db: RMDatabase = get()
+        CharacterRepositoryImpl(get(), get(), get<RMDatabase>().characterDAO(), get())
+    }
 
-        CharacterRepositoryImpl(get(), get(), get<RMDatabase>().characterDAO())
+    single<EpisodeRepository> {
+        EpisodeRepositoryImpl(get(), get<RMDatabase>().episodeDAO(), get())
     }
 
 }

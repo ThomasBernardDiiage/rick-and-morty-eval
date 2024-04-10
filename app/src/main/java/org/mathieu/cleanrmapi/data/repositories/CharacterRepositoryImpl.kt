@@ -15,6 +15,7 @@ import org.mathieu.cleanrmapi.data.remote.CharacterApi
 import org.mathieu.cleanrmapi.data.remote.responses.CharacterResponse
 import org.mathieu.cleanrmapi.domain.models.character.Character
 import org.mathieu.cleanrmapi.domain.repositories.CharacterRepository
+import org.mathieu.cleanrmapi.domain.repositories.EpisodeRepository
 
 private const val CHARACTER_PREFS = "character_repository_preferences"
 private val nextPage = intPreferencesKey("next_characters_page_to_load")
@@ -26,7 +27,8 @@ private val Context.dataStore by preferencesDataStore(
 internal class CharacterRepositoryImpl(
     private val context: Context,
     private val characterApi: CharacterApi,
-    private val characterLocal: CharacterDAO
+    private val characterLocal: CharacterDAO,
+    private val episodeRepository: EpisodeRepository
 ) : CharacterRepository {
 
     override suspend fun getCharacters(): Flow<List<Character>> =
@@ -84,16 +86,21 @@ internal class CharacterRepositoryImpl(
      * @return The [Character] object representing the character details.
      * @throws Exception If the character cannot be found both locally and via the API.
      */
-    override suspend fun getCharacter(id: Int): Character =
-        characterLocal.getCharacter(id)?.toModel()
-            ?: characterApi.getCharacter(id = id)?.let { response ->
-                val obj = response.toRealmObject()
-                characterLocal.insert(obj)
-                obj.toModel()
-            }
-            ?: throw Exception("Character not found.")
+    override suspend fun getCharacter(id: Int): Character {
+        var character = characterLocal.getCharacter(id)
 
+        if (character == null){
+            val response = characterApi.getCharacter(id = id)?.toRealmObject() ?: throw Exception("Character not found.")
 
+            characterLocal.insert(response)
+            character = response
+        }
+
+        // Get episodes for character
+        val episodes = episodeRepository.getEpisodes(character.id)
+
+        return character.toModel(episodes)
+    }
 }
 
 
