@@ -14,6 +14,13 @@ class EpisodeRepositoryImpl(
     private val episodeLocal : EpisodeDAO,
     private val characterApi: CharacterApi
 ) : EpisodeRepository {
+
+    /**
+     * Get all episodes for a character
+     * First check if the episodes are already in the database
+     * If not, fetch them from the API
+     * @param characterId the character id
+     */
     override suspend fun getEpisodes(characterId: Int): List<Episode> {
         // Get all episodes for the character
         val episodesLocal = episodeLocal.getEpisodesForCharacter(characterId)
@@ -40,5 +47,16 @@ class EpisodeRepositoryImpl(
 
 
         return episodes.map { it.toModel() }
+    }
+
+    override suspend fun getEpisode(episodeId: Int): Episode {
+        episodeLocal.getEpisode(episodeId)?.let {
+            return it.toModel()
+        }
+//
+//        val episode = episodeApi.getEpisode(episodeId).toRoomObject()
+//        episodeLocal.insert(episode)
+//        return episode.toModel()
+        TODO()
     }
 }

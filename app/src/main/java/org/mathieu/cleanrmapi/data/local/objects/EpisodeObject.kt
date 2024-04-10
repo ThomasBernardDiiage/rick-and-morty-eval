@@ -16,6 +16,9 @@ class EpisodeObject(
     val url : String,
 )
 
+/**
+ * Convert a [EpisodeResponse] to a [EpisodeObject]
+ */
 internal fun EpisodeResponse.toRoomObject() = EpisodeObject(
     id = id,
     name = name,
@@ -24,6 +27,9 @@ internal fun EpisodeResponse.toRoomObject() = EpisodeObject(
     url = url
 )
 
+/**
+ * Convert a [EpisodeObject] to a [Episode]
+ **/
 internal fun EpisodeObject.toModel() = Episode(
     id = id,
     name = name,

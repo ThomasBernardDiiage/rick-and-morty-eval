@@ -14,9 +14,15 @@ interface EpisodeDAO {
     suspend fun insert(episodes: List<EpisodeObject>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insert(episode: EpisodeObject)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun createLink(link: List<CharacterEpisodeObject>)
 
 
     @Query("select * from ${RMDatabase.EPISODE_TABLE} where id in (select episodeId from ${RMDatabase.CHARACTER_EPISODE_TABLE} where characterId = :characterId)")
     suspend fun getEpisodesForCharacter(characterId: Int): List<EpisodeObject>
+
+    @Query("select * from ${RMDatabase.EPISODE_TABLE} where id = :id")
+    suspend fun getEpisode(id: Int) : EpisodeObject?
 }

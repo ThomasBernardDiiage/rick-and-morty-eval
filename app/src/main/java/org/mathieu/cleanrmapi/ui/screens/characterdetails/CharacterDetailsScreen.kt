@@ -27,6 +27,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -46,11 +47,18 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
+import org.mathieu.cleanrmapi.ui.core.Destination
 import org.mathieu.cleanrmapi.ui.core.composables.EpisodeCard
 import org.mathieu.cleanrmapi.ui.core.composables.PreviewContent
+import org.mathieu.cleanrmapi.ui.core.navigate
 import org.mathieu.cleanrmapi.ui.core.theme.Purple40
+import org.mathieu.cleanrmapi.ui.screens.characters.CharactersAction
 
 private typealias UIState = CharacterDetailsState
+private typealias UIAction = CharacterDetailsAction
+
 
 @Composable
 fun CharacterDetailsScreen(
@@ -62,20 +70,29 @@ fun CharacterDetailsScreen(
 
     viewModel.init(characterId = id)
 
+    LaunchedEffect(viewModel) {
+        viewModel.events
+            .onEach { event ->
+                if (event is Destination.EpisodeDetails)
+                    navController.navigate(destination = event)
+            }.collect()
+    }
+
     CharacterDetailsContent(
         state = state,
-        onClickBack = navController::popBackStack
+        onClickBack = navController::popBackStack,
+        onAction = viewModel::handleAction
     )
 
 }
 
 
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 private fun CharacterDetailsContent(
     state: UIState = UIState(),
-    onClickBack: () -> Unit = { }
+    onClickBack: () -> Unit = { },
+    onAction: (UIAction) -> Unit = { }
 ) = Scaffold(topBar = {
 
     Row(
@@ -175,13 +192,13 @@ private fun CharacterDetailsContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 date = episode.airDate,
                                 episode = episode.episode,
-                                name = episode.name)
+                                name = episode.name){
+                                onAction(CharacterDetailsAction.SelectedEpisode(episode))
+                            }
                         }
                     
                     }
                 }
-
-
             }
         }
     }

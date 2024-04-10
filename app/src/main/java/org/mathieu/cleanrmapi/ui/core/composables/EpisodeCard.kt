@@ -2,6 +2,7 @@ package org.mathieu.cleanrmapi.ui.core.composables
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,9 +16,11 @@ fun EpisodeCard(
     modifier : Modifier = Modifier,
     date : String,
     episode : String,
-    name : String
+    name : String,
+    onClick : () -> Unit = {}
 ) {
-    Card(
+    Button(
+        onClick = onClick,
         modifier = modifier,
         shape = RectangleShape
     ) {

@@ -15,6 +15,7 @@ import org.mathieu.cleanrmapi.ui.core.composable
 import org.mathieu.cleanrmapi.ui.core.theme.LeTheme
 import org.mathieu.cleanrmapi.ui.screens.characterdetails.CharacterDetailsScreen
 import org.mathieu.cleanrmapi.ui.screens.characters.CharactersScreen
+import org.mathieu.cleanrmapi.ui.screens.episodeDetail.EpisodeDetailsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,7 +50,16 @@ private fun MainContent() {
                 navController = navController,
                 id = backStackEntry.arguments?.getInt("characterId") ?: -1
             )
+        }
 
+        composable(
+            destination = Destination.EpisodeDetails()
+        ) { backStackEntry ->
+
+            EpisodeDetailsScreen(
+                navController = navController,
+                id = backStackEntry.arguments?.getInt("episodeId") ?: -1
+            )
         }
 
     }

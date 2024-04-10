@@ -65,7 +65,6 @@ fun CharactersScreen(navController: NavController) {
         state = state,
         onAction = viewModel::handleAction
     )
-
 }
 
 
